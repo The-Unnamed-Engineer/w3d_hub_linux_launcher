@@ -17,10 +17,14 @@ class W3DHub
       elsif async
         BackgroundWorker.job(
           -> { Api.get(uri, W3DHub::Api::DEFAULT_HEADERS) },
-          ->(response) { File.open(path, "wb") { |f| f.write response.body } if response.status == 200 }
+          ->(response) {
+            create_directories(path)
+            File.open(path, "wb") { |f| f.write response.body } if response.status == 200
+          }
         )
       else
         response = Api.get(uri, W3DHub::Api::DEFAULT_HEADERS)
+        create_directories(path)
         File.open(path, "wb") { |f| f.write response.body } if response.status == 200
       end
     end
